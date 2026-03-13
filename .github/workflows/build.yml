@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -22,9 +22,19 @@ jobs:
       - name: Build kernel
         run: |
           chmod +x build.sh
-          ./build.sh -m y2slte -k y -c n
+          ./build.sh -m y2slte -k y -c n 2>&1 | tee build.log
+          exit ${PIPESTATUS[0]}
 
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Upload kernel zip
+        if: success()
+        uses: actions/upload-artifact@v4
         with:
-          submodules: recursive
+          name: kernel-zip
+          path: build/out/y2slte/*.zip
+
+      - name: Upload build log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
