@@ -1,0 +1,31 @@
+name: Build Kernel
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bc bison flex libssl-dev libelf-dev \
+            binutils-aarch64-linux-gnu gcc-aarch64-linux-gnu make \
+            libarchive-tools python3 ccache zip
+
+      - name: Build kernel
+        run: |
+          chmod +x build.sh
+          ./build.sh -m y2slte -k y -c n
+
+      - name: Upload kernel zip
+        uses: actions/upload-artifact@v3
+        with:
+          name: kernel-zip
+          path: build/out/y2slte/*.zip
