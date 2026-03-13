@@ -24,8 +24,7 @@ jobs:
           chmod +x build.sh
           ./build.sh -m y2slte -k y -c n
 
-      - name: Upload kernel zip
-        uses: actions/upload-artifact@v3
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          name: kernel-zip
-          path: build/out/y2slte/*.zip
+          submodules: recursive
